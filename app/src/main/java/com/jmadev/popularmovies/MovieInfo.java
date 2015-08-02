@@ -12,6 +12,7 @@ import java.util.List;
  */
 public class MovieInfo {
 
+    private static final String LOG_TAG = MovieItemAdapter.class.getSimpleName();
     public static final String RESULTS = "results";
     public static final String ORIGINAL_TITLE = "original_title";
     public static final String OVERVIEW = "overview";
@@ -39,6 +40,14 @@ public class MovieInfo {
         return movies;
     }
 
+    public Movie getMovie(int id) throws JSONException {
+        JSONArray movieArrayResults = jsonObject.getJSONArray(RESULTS);
+        JSONObject movieJsonObject = movieArrayResults.getJSONObject(id);
+        return new Movie(getOriginalTitle(movieJsonObject), getOverview(movieJsonObject),
+                getReleaseDate(movieJsonObject), getPosterPath(movieJsonObject),
+                getTitle(movieJsonObject), getVoteAverage(movieJsonObject));
+    }
+
     public String getOriginalTitle(JSONObject jsonObject) throws JSONException {
         return jsonObject.getString(ORIGINAL_TITLE);
     }
@@ -52,7 +61,9 @@ public class MovieInfo {
     }
 
     public String getPosterPath(JSONObject jsonObject) throws JSONException {
-        return jsonObject.getString(POSTER_PATH);
+        String poster_url = "http://image.tmdb.org/t/p/w185" + jsonObject.getString(POSTER_PATH);
+        //Log.v(LOG_TAG, "Movie poster url : " + poster_url);
+        return poster_url;
     }
 
     public String getTitle(JSONObject jsonObject) throws JSONException {

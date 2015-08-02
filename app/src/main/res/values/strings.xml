@@ -2,5 +2,5 @@
     <string name="app_name">PopularMovies</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="api_key">YOUR API KEY</string>
+    <string name="api_key">YOU API KEY</string>
 </resources>

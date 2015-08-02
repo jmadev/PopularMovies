@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,17 +29,7 @@ import java.util.List;
 public class MainActivityFragment extends Fragment {
 
     private MovieItemAdapter movieItemAdapter;
-
-    MovieItem[] movieItems = {
-            new MovieItem("http://www.freedesign4.me/wp-content/gallery/posters/free-movie-film-poster-the_dark_knight_movie_poster.jpg"),
-            new MovieItem("http://gdj.gdj.netdna-cdn.com/wp-content/uploads/2011/12/grey-movie-poster.jpg"),
-            new MovieItem("http://t0.gstatic.com/images?q=tbn:ANd9GcSZpU0mfaphHfdRHAAGxbPCh8UlLn6jYL52a-YYFRUHZPt9MFZK"),
-            new MovieItem("http://www.fatmovieguy.com/wp-content/uploads/2013/09/Don-Jon-Movie-Poster.jpg"),
-            new MovieItem("http://webneel.com/daily/sites/default/files/images/daily/02-2013/24-silence-of-the-lambs-creative-movie-poster-design.jpg")
-    };
-
-    List<MovieItem> movieItems2 = new ArrayList<>();
-
+    private List<MovieInfo> movieInfo;
     public MainActivityFragment() {
     }
 
@@ -54,13 +43,17 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        List<Movie> movies = new ArrayList<>();
+
 //       movieItemAdapter = new MovieItemAdapter(getActivity(), Arrays.asList(movieItems));
-        movieItemAdapter = new MovieItemAdapter(getActivity(),movieItems2);
+        movieItemAdapter = new MovieItemAdapter(getActivity(), movies);
 
 
         GridView gridView = (GridView) rootView.findViewById(R.id.movie_grid);
         gridView.setAdapter(movieItemAdapter);
-
+        if(movies == null) {
+            updateMovie();
+        }
         return rootView;
     }
 
@@ -75,51 +68,36 @@ public class MainActivityFragment extends Fragment {
         updateMovie();
     }
 
-    public class FetchMovieTask extends AsyncTask<Void, Void, String[]> {
+    public class FetchMovieTask extends AsyncTask<Void, Void, List<Movie>> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-        private String[] getMovieDataFromJson(String movieJsonStr, int numMovies)
+        private List<Movie> getMovieDataFromJson(String movieJsonStr, int numMovies)
                 throws JSONException {
 
             // base URL to fetch image
             final String posterBasePathUrl = "http://image.tmdb.org/t/p/w185//";
 
             // These are the names of the JSON objects that need to be extracted.
-            final String TMDB_RESULTS = "results";
+            final String RESULTS = "results";
             final String TMDB_POSTER_PATH = "poster_path";
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
-            JSONArray movieItemArray = movieJson.getJSONArray(TMDB_RESULTS);
 
-            String[] resultStrs = new String[numMovies];
+            MovieInfo movieInfo = new MovieInfo(movieJson.toString());
+            List<Movie> movies = new ArrayList<>();
+            movies.addAll(movieInfo.getMovies());
+            //String url = movieInfo.getPosterPath(movieJson);
+            Log.v(LOG_TAG, "Movie poster url : " + movies);
 
-            for (int i = 0; i < movieItemArray.length(); i++) {
-                String moviePosterURL;
-
-                // Get the JSON object representing the movie
-                //JSONObject movieName = movieItemArray.getJSONObject(i);
-
-                // Get the JSON object representing movie poster
-                JSONObject moviePosterObject = movieItemArray.getJSONObject(i);
-                moviePosterURL = moviePosterObject.getString(TMDB_POSTER_PATH);
-
-                resultStrs[i] = posterBasePathUrl + moviePosterURL;
-            }
-
-            for (String s : resultStrs) {
-                Log.v(LOG_TAG, "Movie entry: " + s);
-            }
-            return resultStrs;
+//            for (String s : resultStrs) {
+//                Log.v(LOG_TAG, "Movie entry: " + s);
+//            }
+            return movies;
         }
 
         @Override
-        protected String[] doInBackground(Void... params) {
-
-//            // Verify size of params
-//            if (params.length == 0) {
-//                return null;
-//            }
+        protected List<Movie> doInBackground(Void... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -207,14 +185,15 @@ public class MainActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
-            if(strings != null) {
+        protected void onPostExecute(List<Movie> movies) {
+            if(movies != null) {
                 movieItemAdapter.clear();
-                for(String moviePosterPath : strings) {
-                    MovieItem mItem = new MovieItem(moviePosterPath);
-                    movieItems2.add(mItem);
+                for(Movie movie : movies) {
+                    movieItemAdapter.add(movie);
+                    Log.v(LOG_TAG, "Movies: " + movie);
 
                 }
+
             }
         }
     }

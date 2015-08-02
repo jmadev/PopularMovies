@@ -43,4 +43,10 @@ public class Movie {
     public double getVoteAverage() {
         return voteAverage;
     }
+
+    @Override
+    public String toString() {
+        return "Movie: \n" + originalTitle + "\n" + overview + "\n" + releaseDate + "\n" + posterPath +
+                "\n" + title + "\n" + voteAverage;
+    }
 }

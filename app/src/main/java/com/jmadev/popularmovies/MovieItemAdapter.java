@@ -1,6 +1,7 @@
 package com.jmadev.popularmovies;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +13,20 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 
-public class MovieItemAdapter extends ArrayAdapter<MovieItem> {
-    //private static final String LOG_TAG = MovieItemAdapter.class.getSimpleName();
+public class MovieItemAdapter extends ArrayAdapter<Movie> {
+    private static final String LOG_TAG = MovieItemAdapter.class.getSimpleName();
 
-    public MovieItemAdapter(Activity context, List<MovieItem> movieItems) {
-        super (context, 0, movieItems);
+    public MovieItemAdapter(Activity context, List<Movie> movies) {
+        super (context, 0, movies);
     }
+
+
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        MovieItem movieItem = getItem(position);
+        Movie movie = getItem(position);
+        Log.v(LOG_TAG, "MovieItemAdapter Called!");
+        Log.v(LOG_TAG, "Movie:: " + movie);
         final ImageView mImageView;
 
         if(convertView == null) {
@@ -31,12 +35,13 @@ public class MovieItemAdapter extends ArrayAdapter<MovieItem> {
         }
 
         mImageView = (ImageView) convertView.findViewById(R.id.movie_image);
-
-        String url = movieItem.img_url;
+        //String url = getItem(position).getPosterPath();
+        String url = movie.getPosterPath();
+        Log.v(LOG_TAG, "Movie poster url : " + url);
 
         Glide.with(getContext())
                 .load(url)
-                //.centerCrop()
+                        //.centerCrop()
                 .fitCenter()
                 .crossFade()
                 .into(mImageView);
