@@ -1,9 +1,11 @@
 package com.jmadev.popularmovies;
 
+import java.io.Serializable;
+
 /**
  * Created by Jae on 8/1/2015.
  */
-public class Movie {
+public class Movie implements Serializable {
     private String originalTitle;
     private String overview;
     private String releaseDate;

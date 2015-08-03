@@ -1,5 +1,6 @@
 package com.jmadev.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONException;
@@ -30,6 +32,7 @@ public class MainActivityFragment extends Fragment {
 
     private MovieItemAdapter movieItemAdapter;
     private List<MovieInfo> movieInfo;
+    public final static String SER_KEY = "com.jmadev.popularmovies.ser";
     public MainActivityFragment() {
     }
 
@@ -51,6 +54,18 @@ public class MainActivityFragment extends Fragment {
 
         GridView gridView = (GridView) rootView.findViewById(R.id.movie_grid);
         gridView.setAdapter(movieItemAdapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Movie movie = (Movie) parent.getAdapter().getItem(position);
+                Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+//                        .putExtra("movie", movie);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(SER_KEY, movie);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
         if(movies == null) {
             updateMovie();
         }
