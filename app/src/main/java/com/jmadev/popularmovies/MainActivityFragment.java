@@ -128,12 +128,12 @@ public class MainActivityFragment extends Fragment {
 
             try {
                 //Construct the UR: for the themovie.db.org query
-                final String MOVE_BASE_URL =
+                final String MOVIE_BASE_URL =
                         "http://api.themoviedb.org/3/discover/movie?";
                 final String SORT_PARAM = "sort_by";
                 String API_KEY_PARAM = "api_key";
 
-                Uri builtUri = Uri.parse(MOVE_BASE_URL).buildUpon()
+                Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
                         .appendQueryParameter(SORT_PARAM, sortByPopularity)
                         .appendQueryParameter(API_KEY_PARAM, apiKey)
                         .build();

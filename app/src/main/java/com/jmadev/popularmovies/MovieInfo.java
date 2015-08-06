@@ -14,6 +14,7 @@ public class MovieInfo {
 
     private static final String LOG_TAG = MovieItemAdapter.class.getSimpleName();
     public static final String RESULTS = "results";
+    public static final String BACKDROP_PATH = "backdrop_path";
     public static final String ORIGINAL_TITLE = "original_title";
     public static final String OVERVIEW = "overview";
     public static final String RELEASE_DATE = "release_date";
@@ -32,7 +33,7 @@ public class MovieInfo {
         List<Movie> movies = new ArrayList<>();
         for (int i = 0; i < movieArrayResults.length(); i++) {
             JSONObject movieJsonObject = movieArrayResults.getJSONObject(i);
-            Movie movie = new Movie(getOriginalTitle(movieJsonObject), getOverview(movieJsonObject),
+            Movie movie = new Movie(getBackdropPath(movieJsonObject), getOriginalTitle(movieJsonObject), getOverview(movieJsonObject),
                     getReleaseDate(movieJsonObject), getPosterPath(movieJsonObject),
                     getTitle(movieJsonObject), getVoteAverage(movieJsonObject));
             movies.add(movie);
@@ -43,9 +44,14 @@ public class MovieInfo {
     public Movie getMovie(int id) throws JSONException {
         JSONArray movieArrayResults = jsonObject.getJSONArray(RESULTS);
         JSONObject movieJsonObject = movieArrayResults.getJSONObject(id);
-        return new Movie(getOriginalTitle(movieJsonObject), getOverview(movieJsonObject),
+        return new Movie(getBackdropPath(movieJsonObject),getOriginalTitle(movieJsonObject), getOverview(movieJsonObject),
                 getReleaseDate(movieJsonObject), getPosterPath(movieJsonObject),
                 getTitle(movieJsonObject), getVoteAverage(movieJsonObject));
+    }
+
+    public String getBackdropPath(JSONObject jsonObject) throws JSONException {
+        String backdrop_url = "http://image.tmdb.org/t/p/w780" + jsonObject.getString(BACKDROP_PATH);
+        return backdrop_url;
     }
 
     public String getOriginalTitle(JSONObject jsonObject) throws JSONException {
@@ -61,7 +67,7 @@ public class MovieInfo {
     }
 
     public String getPosterPath(JSONObject jsonObject) throws JSONException {
-        String poster_url = "http://image.tmdb.org/t/p/w185" + jsonObject.getString(POSTER_PATH);
+        String poster_url = "http://image.tmdb.org/t/p/w780" + jsonObject.getString(POSTER_PATH);
         //Log.v(LOG_TAG, "Movie poster url : " + poster_url);
         return poster_url;
     }
