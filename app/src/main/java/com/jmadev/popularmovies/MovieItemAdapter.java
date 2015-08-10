@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
@@ -28,20 +29,20 @@ public class MovieItemAdapter extends ArrayAdapter<Movie> {
         Log.v(LOG_TAG, "MovieItemAdapter Called!");
         Log.v(LOG_TAG, "Movie:: " + movie);
         final ImageView mImageView;
-
+        final TextView textView;
         if(convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(
                     R.layout.movie_item, parent, false);
         }
 
         mImageView = (ImageView) convertView.findViewById(R.id.movie_image);
-        //String url = getItem(position).getPosterPath();
+        textView = (TextView) convertView.findViewById(R.id.movie_title);
+        textView.setText(movie.getOriginalTitle());
         String url = movie.getPosterPath();
         Log.v(LOG_TAG, "Movie poster url : " + url);
 
         Glide.with(getContext())
                 .load(url)
-                        //.centerCrop()
                 .fitCenter()
                 .crossFade()
                 .into(mImageView);

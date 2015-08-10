@@ -1,16 +1,23 @@
 package com.jmadev.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,15 +37,51 @@ import java.util.List;
  */
 public class MainActivityFragment extends Fragment {
 
+    private static final String POPULARITY_DESC = "popularity.desc";
+    private static final String RATING_DESC = "vote_average.desc";
+    private String sortBy = POPULARITY_DESC;
+
     private MovieItemAdapter movieItemAdapter;
-    private List<MovieInfo> movieInfo;
     public final static String SER_KEY = "com.jmadev.popularmovies.ser";
+
     public MainActivityFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_sort_by_popularity:
+                if (item.isChecked())
+                    item.setChecked(false);
+                else
+                    item.setChecked(true);
+                sortBy = POPULARITY_DESC;
+                updateMovie(sortBy);
+                return true;
+            case R.id.action_sort_by_rating:
+                if (item.isChecked())
+                    item.setChecked(false);
+                else
+                    item.setChecked(true);
+                sortBy = RATING_DESC;
+                updateMovie(sortBy);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -48,7 +91,6 @@ public class MainActivityFragment extends Fragment {
 
         List<Movie> movies = new ArrayList<>();
 
-//       movieItemAdapter = new MovieItemAdapter(getActivity(), Arrays.asList(movieItems));
         movieItemAdapter = new MovieItemAdapter(getActivity(), movies);
 
 
@@ -59,50 +101,52 @@ public class MainActivityFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie movie = (Movie) parent.getAdapter().getItem(position);
                 Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-//                        .putExtra("movie", movie);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(SER_KEY, movie);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
-        if(movies == null) {
-            updateMovie();
-        }
+
+
+            updateMovie(sortBy);
         return rootView;
     }
 
-    private void updateMovie() {
-        FetchMovieTask movieTask = new FetchMovieTask();
-        movieTask.execute();
+    private boolean hasInternetConnection() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isAvailable() && activeNetwork.isConnected()) {
+            return true;
+        }
+        else
+            Toast.makeText(getActivity(), "No Internet connection, please check connectivity!",
+                    Toast.LENGTH_LONG).show();
+        return false;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateMovie();
+
+    private void updateMovie(String sortBy) {
+        if(hasInternetConnection()) {
+            FetchMovieTask movieTask = new FetchMovieTask();
+            movieTask.execute(sortBy);
+        }
     }
 
-    public class FetchMovieTask extends AsyncTask<Void, Void, List<Movie>> {
+    public class FetchMovieTask extends AsyncTask<String, Void, List<Movie>> {
 
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-        private List<Movie> getMovieDataFromJson(String movieJsonStr, int numMovies)
+        private List<Movie> getMovieDataFromJson(String movieJsonStr)
                 throws JSONException {
-
-            // base URL to fetch image
-            final String posterBasePathUrl = "http://image.tmdb.org/t/p/w185//";
-
-            // These are the names of the JSON objects that need to be extracted.
-            final String RESULTS = "results";
-            final String TMDB_POSTER_PATH = "poster_path";
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
 
             MovieInfo movieInfo = new MovieInfo(movieJson.toString());
             List<Movie> movies = new ArrayList<>();
             movies.addAll(movieInfo.getMovies());
-            //String url = movieInfo.getPosterPath(movieJson);
             Log.v(LOG_TAG, "Movie poster url : " + movies);
 
 //            for (String s : resultStrs) {
@@ -112,7 +156,7 @@ public class MainActivityFragment extends Fragment {
         }
 
         @Override
-        protected List<Movie> doInBackground(Void... params) {
+        protected List<Movie> doInBackground(String... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -122,9 +166,7 @@ public class MainActivityFragment extends Fragment {
             // Will contain the raw JASON response as a string
             String movieJsonStr = null;
 
-            String sortByPopularity = "popularity.desc";
             String apiKey = getString(R.string.api_key);
-            int numMovies = 20;
 
             try {
                 //Construct the UR: for the themovie.db.org query
@@ -134,7 +176,7 @@ public class MainActivityFragment extends Fragment {
                 String API_KEY_PARAM = "api_key";
 
                 Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-                        .appendQueryParameter(SORT_PARAM, sortByPopularity)
+                        .appendQueryParameter(SORT_PARAM, params[0])
                         .appendQueryParameter(API_KEY_PARAM, apiKey)
                         .build();
 
@@ -150,7 +192,7 @@ public class MainActivityFragment extends Fragment {
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
-                if(inputStream == null) {
+                if (inputStream == null) {
                     // Nothing to do
                     return null;
                 }
@@ -170,9 +212,9 @@ public class MainActivityFragment extends Fragment {
                 }
                 movieJsonStr = buffer.toString();
 
-                Log.v(LOG_TAG, "Movie JSON String: " + movieJsonStr);
+                Log.v(LOG_TAG, "Movie JSON String: " + url);
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error" , e);
+                Log.e(LOG_TAG, "Error", e);
                 // If the code didn't successfully get the movie data, there's no point in attempting
                 // to parse it
                 return null;
@@ -190,7 +232,7 @@ public class MainActivityFragment extends Fragment {
             }
 
             try {
-                return getMovieDataFromJson(movieJsonStr, numMovies);
+                return getMovieDataFromJson(movieJsonStr);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -201,9 +243,9 @@ public class MainActivityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
-            if(movies != null) {
+            if (movies != null) {
                 movieItemAdapter.clear();
-                for(Movie movie : movies) {
+                for (Movie movie : movies) {
                     movieItemAdapter.add(movie);
                     Log.v(LOG_TAG, "Movies: " + movie);
 
