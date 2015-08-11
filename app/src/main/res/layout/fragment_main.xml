@@ -10,4 +10,6 @@
     android:stretchMode="columnWidth"
     android:padding="5dp"
     android:verticalSpacing="5dp"
-    tools:context=".MainActivityFragment"/>
+    tools:context=".MainActivityFragment"
+    android:drawSelectorOnTop="true"
+    />

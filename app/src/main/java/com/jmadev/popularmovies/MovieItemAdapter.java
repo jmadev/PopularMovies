@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 
-public class MovieItemAdapter extends ArrayAdapter<Movie> {
+public class MovieItemAdapter extends ArrayAdapter<Movie>  {
     private static final String LOG_TAG = MovieItemAdapter.class.getSimpleName();
 
     public MovieItemAdapter(Activity context, List<Movie> movies) {

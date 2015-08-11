@@ -39,10 +39,13 @@ public class MainActivityFragment extends Fragment {
 
     private static final String POPULARITY_DESC = "popularity.desc";
     private static final String RATING_DESC = "vote_average.desc";
+    private static final String SORT_BY_SETTINGS_KEY = "";
     private String sortBy = POPULARITY_DESC;
+
 
     private MovieItemAdapter movieItemAdapter;
     public final static String SER_KEY = "com.jmadev.popularmovies.ser";
+
 
     public MainActivityFragment() {
     }
@@ -56,6 +59,20 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem action_sort_by_popularity = menu.findItem(R.id.action_sort_by_popularity);
+        MenuItem action_sort_by_rating = menu.findItem(R.id.action_sort_by_rating);
+
+        switch(sortBy) {
+            case POPULARITY_DESC:
+                if(!action_sort_by_popularity.isChecked())
+                    action_sort_by_popularity.setChecked(true);
+                return;
+            case RATING_DESC:
+                if(!action_sort_by_rating.isChecked())
+                    action_sort_by_rating.setChecked(true);
+                return;
+        }
     }
 
     @Override
@@ -108,9 +125,22 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
+        if(savedInstanceState != null) {
+            if(savedInstanceState.containsKey(SORT_BY_SETTINGS_KEY)) {
+                sortBy = savedInstanceState.getString(SORT_BY_SETTINGS_KEY);
+            }
+        }
+
 
             updateMovie(sortBy);
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if(!sortBy.contentEquals(POPULARITY_DESC))
+            outState.putString(SORT_BY_SETTINGS_KEY, sortBy);
+        super.onSaveInstanceState(outState);
     }
 
     private boolean hasInternetConnection() {
