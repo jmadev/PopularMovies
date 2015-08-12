@@ -3,7 +3,6 @@ package com.jmadev.popularmovies;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +38,7 @@ public class MovieDetailActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        movie = (Movie) getActivity().getIntent().getSerializableExtra(MainActivityFragment.SER_KEY);
+        movie = getActivity().getIntent().getParcelableExtra(MainActivityFragment.PAR_KEY);
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
         if (movie != null) {
@@ -51,7 +50,6 @@ public class MovieDetailActivityFragment extends Fragment {
             movie_release_date = (TextView) rootView.findViewById(R.id.movie_release_date);
             overview_info = (TextView) rootView.findViewById(R.id.overview_info);
             vote_average.setText(Double.toString(movie.getVoteAverage()));
-            Log.v(LOG_TAG, "Movie poster url : " + movie);
             collapsingToolbarLayout.setTitle(movie.getTitle());
             String movieBackdropPathURL = movie.getBackdropPath();
             String moviePosterURL = movie.getPosterPath();

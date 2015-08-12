@@ -3,6 +3,8 @@ package com.jmadev.popularmovies;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+
 
 public class Movie implements Parcelable {
     private String backdropPath;
@@ -77,11 +79,19 @@ public class Movie implements Parcelable {
         return voteAverage;
     }
 
+    public Movie getMovie(int id) throws JSONException {
+        return new Movie(getBackdropPath(),getOriginalTitle(), getOverview(),
+                getReleaseDate(), getPosterPath(),
+                getTitle(), getVoteAverage());
+    }
+
+
     @Override
     public String toString() {
         return "Movie: \n" + backdropPath + "\n" + originalTitle + "\n" + overview + "\n" + releaseDate + "\n" + posterPath +
                 "\n" + title + "\n" + voteAverage;
     }
+
 
     @Override
     public int describeContents() {
@@ -91,16 +101,18 @@ public class Movie implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {
-            this.backdropPath,
-            this.originalTitle,
-            this.overview,
-            this.releaseDate,
-            this.posterPath,
-            this.title
+                this.backdropPath,
+                this.originalTitle,
+                this.overview,
+                this.releaseDate,
+                this.posterPath,
+                this.title
         });
 
         dest.writeDoubleArray(new double[] {
                 this.voteAverage
         });
     }
+
+
 }

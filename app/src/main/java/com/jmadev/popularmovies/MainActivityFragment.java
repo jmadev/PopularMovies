@@ -35,16 +35,19 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment  {
 
+    private static final String MOVIES_KEY = "state_movies";
+    private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+    private List<Movie> movies = new ArrayList<>();
     private static final String POPULARITY_DESC = "popularity.desc";
     private static final String RATING_DESC = "vote_average.desc";
     private static final String SORT_BY_SETTINGS_KEY = "";
     private String sortBy = POPULARITY_DESC;
-
+    private ArrayList<Movie> mListMovies = new ArrayList<>();
 
     private MovieItemAdapter movieItemAdapter;
-    public final static String SER_KEY = "com.jmadev.popularmovies.ser";
+    public final static String PAR_KEY = "com.jmadev.popularmovies.par";
 
 
     public MainActivityFragment() {
@@ -54,6 +57,7 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -63,15 +67,14 @@ public class MainActivityFragment extends Fragment {
         MenuItem action_sort_by_popularity = menu.findItem(R.id.action_sort_by_popularity);
         MenuItem action_sort_by_rating = menu.findItem(R.id.action_sort_by_rating);
 
-        switch(sortBy) {
+        switch (sortBy) {
             case POPULARITY_DESC:
-                if(!action_sort_by_popularity.isChecked())
+                if (!action_sort_by_popularity.isChecked())
                     action_sort_by_popularity.setChecked(true);
-                return;
+                break;
             case RATING_DESC:
-                if(!action_sort_by_rating.isChecked())
+                if (!action_sort_by_rating.isChecked())
                     action_sort_by_rating.setChecked(true);
-                return;
         }
     }
 
@@ -106,10 +109,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        List<Movie> movies = new ArrayList<>();
-
         movieItemAdapter = new MovieItemAdapter(getActivity(), movies);
-
 
         GridView gridView = (GridView) rootView.findViewById(R.id.movie_grid);
         gridView.setAdapter(movieItemAdapter);
@@ -119,27 +119,35 @@ public class MainActivityFragment extends Fragment {
                 Movie movie = (Movie) parent.getAdapter().getItem(position);
                 Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable(SER_KEY, movie);
+                bundle.putParcelable(PAR_KEY, movie);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
 
-        if(savedInstanceState != null) {
-            if(savedInstanceState.containsKey(SORT_BY_SETTINGS_KEY)) {
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(SORT_BY_SETTINGS_KEY)) {
                 sortBy = savedInstanceState.getString(SORT_BY_SETTINGS_KEY);
             }
-        }
 
-
+            if (savedInstanceState.containsKey(MOVIES_KEY)) {
+                mListMovies = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
+                movieItemAdapter.setMovies(mListMovies);
+            } else {
+                updateMovie(sortBy);
+            }
+        } else {
             updateMovie(sortBy);
+        }
         return rootView;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if(!sortBy.contentEquals(POPULARITY_DESC))
+        if (!sortBy.contentEquals(POPULARITY_DESC))
             outState.putString(SORT_BY_SETTINGS_KEY, sortBy);
+        if (mListMovies != null)
+            outState.putParcelableArrayList(MOVIES_KEY, mListMovies);
         super.onSaveInstanceState(outState);
     }
 
@@ -150,8 +158,7 @@ public class MainActivityFragment extends Fragment {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isAvailable() && activeNetwork.isConnected()) {
             return true;
-        }
-        else
+        } else
             Toast.makeText(getActivity(), "No Internet connection, please check connectivity!",
                     Toast.LENGTH_LONG).show();
         return false;
@@ -159,34 +166,30 @@ public class MainActivityFragment extends Fragment {
 
 
     private void updateMovie(String sortBy) {
-        if(hasInternetConnection()) {
+        if (hasInternetConnection()) {
             FetchMovieTask movieTask = new FetchMovieTask();
             movieTask.execute(sortBy);
         }
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, List<Movie>> {
 
+    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>> {
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-        private List<Movie> getMovieDataFromJson(String movieJsonStr)
+        private ArrayList<Movie> getMovieDataFromJson(String movieJsonStr)
                 throws JSONException {
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
 
             MovieInfo movieInfo = new MovieInfo(movieJson.toString());
-            List<Movie> movies = new ArrayList<>();
+            ArrayList<Movie> movies = new ArrayList<>();
             movies.addAll(movieInfo.getMovies());
-            Log.v(LOG_TAG, "Movie poster url : " + movies);
 
-//            for (String s : resultStrs) {
-//                Log.v(LOG_TAG, "Movie entry: " + s);
-//            }
             return movies;
         }
 
         @Override
-        protected List<Movie> doInBackground(String... params) {
+        protected ArrayList<Movie> doInBackground(String... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -221,7 +224,7 @@ public class MainActivityFragment extends Fragment {
 
                 // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 if (inputStream == null) {
                     // Nothing to do
                     return null;
@@ -233,7 +236,7 @@ public class MainActivityFragment extends Fragment {
                     // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                     // But it does make debugging a lot easier if you print out the completed
                     // buffer for debugging
-                    buffer.append(line + "\n");
+                    buffer.append(line).append("\n");
                 }
 
                 if (buffer.length() == 0) {
@@ -267,20 +270,17 @@ public class MainActivityFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            // This will only happen if there was an error getting or pasing the movie.
+            // This will only happen if there was an error getting or passing the movie.
             return null;
         }
 
         @Override
-        protected void onPostExecute(List<Movie> movies) {
+        protected void onPostExecute(ArrayList<Movie> movies) {
             if (movies != null) {
-                movieItemAdapter.clear();
-                for (Movie movie : movies) {
-                    movieItemAdapter.add(movie);
-                    Log.v(LOG_TAG, "Movies: " + movie);
-
-                }
-
+                if (movieItemAdapter != null)
+                    movieItemAdapter.setMovies(movies);
+                mListMovies = new ArrayList<>();
+                mListMovies.addAll(movies);
             }
         }
     }

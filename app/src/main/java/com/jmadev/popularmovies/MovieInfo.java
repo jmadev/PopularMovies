@@ -7,9 +7,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jae on 8/1/2015.
- */
+
 public class MovieInfo {
 
     private static final String LOG_TAG = MovieItemAdapter.class.getSimpleName();
@@ -50,8 +48,7 @@ public class MovieInfo {
     }
 
     public String getBackdropPath(JSONObject jsonObject) throws JSONException {
-        String backdrop_url = "http://image.tmdb.org/t/p/w780" + jsonObject.getString(BACKDROP_PATH);
-        return backdrop_url;
+        return "http://image.tmdb.org/t/p/w780" + jsonObject.getString(BACKDROP_PATH);
     }
 
     public String getOriginalTitle(JSONObject jsonObject) throws JSONException {
@@ -67,9 +64,8 @@ public class MovieInfo {
     }
 
     public String getPosterPath(JSONObject jsonObject) throws JSONException {
-        String poster_url = "http://image.tmdb.org/t/p/w780" + jsonObject.getString(POSTER_PATH);
         //Log.v(LOG_TAG, "Movie poster url : " + poster_url);
-        return poster_url;
+        return "http://image.tmdb.org/t/p/w780" + jsonObject.getString(POSTER_PATH);
     }
 
     public String getTitle(JSONObject jsonObject) throws JSONException {

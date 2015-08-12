@@ -49,4 +49,11 @@ public class MovieItemAdapter extends ArrayAdapter<Movie>  {
 
         return convertView;
     }
+
+    public void setMovies(List<Movie> listMovies) {
+        clear();
+        for(Movie movie : listMovies) {
+            add(movie);
+        }
+    }
 }
