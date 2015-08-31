@@ -1,6 +1,6 @@
 package com.jmadev.popularmovies;
 
-import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,7 @@ import java.util.List;
 public class MovieItemAdapter extends ArrayAdapter<Movie>  {
     private static final String LOG_TAG = MovieItemAdapter.class.getSimpleName();
 
-    public MovieItemAdapter(Activity context, List<Movie> movies) {
+    public MovieItemAdapter(Context context, List<Movie> movies) {
         super (context, 0, movies);
     }
 
@@ -37,10 +37,10 @@ public class MovieItemAdapter extends ArrayAdapter<Movie>  {
 
         mImageView = (ImageView) convertView.findViewById(R.id.movie_image);
         textView = (TextView) convertView.findViewById(R.id.movie_title);
-        textView.setText(movie.getOriginalTitle());
+        textView.setText(movie.getTitle());
         String url = movie.getPosterPath();
         Log.v(LOG_TAG, "Movie poster url : " + url);
-
+        Log.v(LOG_TAG, "MOVIEITEMADAPATER CAPLLED!");
         Glide.with(getContext())
                 .load(url)
                 .fitCenter()

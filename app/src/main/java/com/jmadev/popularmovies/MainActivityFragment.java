@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,8 +36,9 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment  {
+public class MainActivityFragment extends Fragment {
 
+    public static final String RESULTS = "results";
     private static final String MOVIES_KEY = "state_movies";
     private final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     private List<Movie> movies = new ArrayList<>();
@@ -45,7 +47,6 @@ public class MainActivityFragment extends Fragment  {
     private static final String SORT_BY_SETTINGS_KEY = "";
     private String sortBy = POPULARITY_DESC;
     private ArrayList<Movie> mListMovies = new ArrayList<>();
-
     private MovieItemAdapter movieItemAdapter;
     public final static String PAR_KEY = "com.jmadev.popularmovies.par";
 
@@ -173,23 +174,34 @@ public class MainActivityFragment extends Fragment  {
     }
 
 
-    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>> {
+    public class FetchMovieTask extends AsyncTask<String, Void, List<Movie>> {
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-        private ArrayList<Movie> getMovieDataFromJson(String movieJsonStr)
+        private List<Movie> getMovieDataFromJson(String movieJsonStr)
                 throws JSONException {
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
+            JSONArray movieArray = movieJson.getJSONArray(RESULTS);
 
-            MovieInfo movieInfo = new MovieInfo(movieJson.toString());
-            ArrayList<Movie> movies = new ArrayList<>();
-            movies.addAll(movieInfo.getMovies());
+            List<Movie> movieResults = new ArrayList<>();
+            for (int i = 0; i < movieArray.length(); i++) {
+                JSONObject movieObject = movieArray.getJSONObject(i);
+                Movie movie = new Movie();
+                movie.setId(movieObject);
+                movie.setBackdropPath(movieObject);
+                movie.setOverview(movieObject);
+                movie.setReleaseDate(movieObject);
+                movie.setPosterPath(movieObject);
+                movie.setTitle(movieObject);
+                movie.setVoteAverage(movieObject);
+                movieResults.add(movie);
 
-            return movies;
+                }
+            return movieResults;
         }
 
         @Override
-        protected ArrayList<Movie> doInBackground(String... params) {
+        protected List<Movie> doInBackground(String... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -275,13 +287,18 @@ public class MainActivityFragment extends Fragment  {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Movie> movies) {
+        protected void onPostExecute(List<Movie> movies) {
+
             if (movies != null) {
                 if (movieItemAdapter != null)
                     movieItemAdapter.setMovies(movies);
                 mListMovies = new ArrayList<>();
                 mListMovies.addAll(movies);
+                Log.v(LOG_TAG, "MOVIES" + movies);
             }
+
         }
     }
+
+
 }
