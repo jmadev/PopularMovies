@@ -37,6 +37,7 @@ import java.util.List;
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
+//        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String RESULTS = "results";
     private static final String MOVIES_KEY = "state_movies";
@@ -49,7 +50,6 @@ public class MainActivityFragment extends Fragment {
     private ArrayList<Movie> mListMovies = new ArrayList<>();
     private MovieItemAdapter movieItemAdapter;
     public final static String PAR_KEY = "com.jmadev.popularmovies.par";
-
 
     public MainActivityFragment() {
     }
@@ -106,7 +106,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -173,17 +173,16 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
-
-    public class FetchMovieTask extends AsyncTask<String, Void, List<Movie>> {
+    public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>> {
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-        private List<Movie> getMovieDataFromJson(String movieJsonStr)
+        private ArrayList<Movie> getMovieDataFromJson(String movieJsonStr)
                 throws JSONException {
 
             JSONObject movieJson = new JSONObject(movieJsonStr);
             JSONArray movieArray = movieJson.getJSONArray(RESULTS);
 
-            List<Movie> movieResults = new ArrayList<>();
+            ArrayList<Movie> movieResults = new ArrayList<>();
             for (int i = 0; i < movieArray.length(); i++) {
                 JSONObject movieObject = movieArray.getJSONObject(i);
                 Movie movie = new Movie();
@@ -195,13 +194,13 @@ public class MainActivityFragment extends Fragment {
                 movie.setTitle(movieObject);
                 movie.setVoteAverage(movieObject);
                 movieResults.add(movie);
-
-                }
+                Log.d(LOG_TAG, "Movie: " + movie);
+            }
             return movieResults;
         }
 
         @Override
-        protected List<Movie> doInBackground(String... params) {
+        protected ArrayList<Movie> doInBackground(String... params) {
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -214,7 +213,7 @@ public class MainActivityFragment extends Fragment {
             String apiKey = getString(R.string.api_key);
 
             try {
-                //Construct the UR: for the themovie.db.org query
+                //Construct the URL for the themovie.db.org query
                 final String MOVIE_BASE_URL =
                         "http://api.themoviedb.org/3/discover/movie?";
                 final String SORT_PARAM = "sort_by";
@@ -287,18 +286,16 @@ public class MainActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<Movie> movies) {
-
+        protected void onPostExecute(ArrayList<Movie> movies) {
             if (movies != null) {
                 if (movieItemAdapter != null)
                     movieItemAdapter.setMovies(movies);
-                mListMovies = new ArrayList<>();
                 mListMovies.addAll(movies);
-                Log.v(LOG_TAG, "MOVIES" + movies);
             }
-
         }
     }
-
-
 }
+
+
+
+
