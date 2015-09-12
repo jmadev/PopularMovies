@@ -1,4 +1,4 @@
-package com.jmadev.popularmovies;
+package com.jmadev.popularmovies.models;
 
 
 import org.json.JSONException;

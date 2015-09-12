@@ -1,4 +1,4 @@
-package com.jmadev.popularmovies;
+package com.jmadev.popularmovies.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.jmadev.popularmovies.R;
+import com.jmadev.popularmovies.models.Movie;
 
 import java.util.List;
 

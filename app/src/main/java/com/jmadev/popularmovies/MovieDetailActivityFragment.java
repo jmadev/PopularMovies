@@ -16,6 +16,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.flaviofaria.kenburnsview.KenBurnsView;
+import com.jmadev.popularmovies.adapters.CastAdapter;
+import com.jmadev.popularmovies.adapters.TrailerAdapter;
+import com.jmadev.popularmovies.models.Cast;
+import com.jmadev.popularmovies.models.Movie;
+import com.jmadev.popularmovies.models.Trailer;
 import com.linearlistview.LinearListView;
 
 import org.json.JSONArray;
@@ -41,6 +46,8 @@ public class MovieDetailActivityFragment extends Fragment {
     private final String LOG_TAG = MovieDetailActivityFragment.class.getSimpleName();
     public static final String YOUTUBE = "youtube";
     public static final String TRAILERS = "trailers";
+    public static final String CREDITS = "credits";
+    public static final String CAST = "cast";
     ImageView movie_poster_image;
     KenBurnsView movie_backdrop;
     CollapsingToolbarLayout collapsingToolbarLayout;
@@ -51,7 +58,9 @@ public class MovieDetailActivityFragment extends Fragment {
     RatingBar ratingBar;
     public int movieId;
     private TrailerAdapter trailerAdapter;
+    private CastAdapter castAdapter;
     private ArrayList<Trailer> mListTrailers = new ArrayList<>();
+    private ArrayList<Cast> mListCast = new ArrayList<>();
 
     public MovieDetailActivityFragment() {
     }
@@ -76,9 +85,13 @@ public class MovieDetailActivityFragment extends Fragment {
                 Trailer trailer = trailerAdapter.getItem(position);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("http://www.youtube.com/watch?v=" + trailer.getSource()));
-                        startActivity(intent);
+                startActivity(intent);
             }
         });
+
+        castAdapter = new CastAdapter(getActivity(), mListCast);
+        LinearListView castView = (LinearListView) rootView.findViewById(R.id.cast_list);
+        castView.setAdapter(castAdapter);
 
         if (movie != null) {
             collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
@@ -117,10 +130,13 @@ public class MovieDetailActivityFragment extends Fragment {
         }
         FetchMovieTrailersTask task = new FetchMovieTrailersTask();
         task.execute();
+
+        FetchMovieCastTask castTask = new FetchMovieCastTask();
+        castTask.execute();
         return rootView;
     }
 
-    public class FetchMovieTrailersTask extends AsyncTask<Integer, Void, ArrayList<Trailer>> {
+    public class FetchMovieTrailersTask extends AsyncTask<Void, Void, ArrayList<Trailer>> {
 
         private final String LOG_TAG = FetchMovieTrailersTask.class.getSimpleName();
 
@@ -144,14 +160,14 @@ public class MovieDetailActivityFragment extends Fragment {
         }
 
         @Override
-        protected ArrayList<Trailer> doInBackground(Integer... params) {
+        protected ArrayList<Trailer> doInBackground(Void... params) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
             // Will contain the raw JASON response as a string
-            String trailerJsonStr = null;
+            String movieJsonStr = null;
 
             String apiKey = getString(R.string.api_key);
             String _ID = Integer.toString(movie.getId());
@@ -198,9 +214,9 @@ public class MovieDetailActivityFragment extends Fragment {
                     // Stream was empty. No point in parsing.
                     return null;
                 }
-                trailerJsonStr = buffer.toString();
+                movieJsonStr = buffer.toString();
 
-                Log.v(LOG_TAG, "Movie JSON String: " + trailerJsonStr);
+                Log.v(LOG_TAG, "Movie JSON String: " + movieJsonStr);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error", e);
                 // If the code didn't successfully get the movie data, there's no point in attempting
@@ -220,7 +236,7 @@ public class MovieDetailActivityFragment extends Fragment {
             }
 
             try {
-                return getMovieTrailerFromJson(trailerJsonStr);
+                return getMovieTrailerFromJson(movieJsonStr);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -235,6 +251,122 @@ public class MovieDetailActivityFragment extends Fragment {
                     trailerAdapter.setTrailers(trailers);
                 }
                 mListTrailers.addAll(trailers);
+            }
+        }
+    }
+
+    public class FetchMovieCastTask extends AsyncTask<Void, Void, ArrayList<Cast>> {
+
+        private final String LOG_TAG = FetchMovieCastTask.class.getSimpleName();
+
+        private ArrayList<Cast> getMovieCastFromJson(String castJsonStr) throws JSONException {
+            JSONObject creditsJson = new JSONObject(castJsonStr);
+            JSONObject castJson = (JSONObject) creditsJson.get(CREDITS);
+            JSONArray castArray = castJson.getJSONArray(CAST);
+
+            ArrayList<Cast> castResults = new ArrayList<>();
+            for (int i = 0; i < castArray.length(); i++) {
+                JSONObject castObject = castArray.getJSONObject(i);
+                Cast cast = new Cast();
+                cast.setName(castObject);
+                cast.setProfile_path(castObject);
+                castResults.add(cast);
+            }
+            return castResults;
+        }
+
+        @Override
+        protected ArrayList<Cast> doInBackground(Void... params) {
+            // These two need to be declared outside the try/catch
+            // so that they can be closed in the finally block.
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // Will contain the raw JASON response as a string
+            String movieJsonStr = null;
+
+            String apiKey = getString(R.string.api_key);
+            String _ID = Integer.toString(movie.getId());
+            String creditsTrailersReviews = "credits,trailers,reviews";
+
+            try {
+                //Construct the URL for the themovie.db.query
+                final String MOVIE_BASE_URL = "http://api.themoviedb.org/3/movie/" + _ID + "?";
+                final String API_KEY_PARAM = "api_key";
+                final String appendCreditsReviewsTrailers = "append_to_response";
+
+                Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
+                        .appendQueryParameter(API_KEY_PARAM, apiKey)
+                        .appendQueryParameter(appendCreditsReviewsTrailers, creditsTrailersReviews)
+                        .build();
+
+                URL url = new URL(builtUri.toString());
+
+                Log.v(LOG_TAG, "Built URI: " + builtUri.toString());
+
+                // Create request to themovie.db.org, and open the connection
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                // Read the input stream into a String
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuilder buffer = new StringBuilder();
+                if (inputStream == null) {
+                    // Nothing to do
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                    // But it does make debugging a lot easier if you print out the completed
+                    // buffer for debugging
+                    buffer.append(line).append("\n");
+                }
+
+                if (buffer.length() == 0) {
+                    // Stream was empty. No point in parsing.
+                    return null;
+                }
+                movieJsonStr = buffer.toString();
+
+                Log.v(LOG_TAG, "Movie JSON String: " + movieJsonStr);
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error", e);
+                // If the code didn't successfully get the movie data, there's no point in attempting
+                // to parse it
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error closing stream", e);
+                    }
+                }
+            }
+
+            try {
+                return getMovieCastFromJson(movieJsonStr);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            // This will only happen if there was an error getting or passing the movie.
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Cast> cast) {
+            if(cast != null) {
+                if(castAdapter != null) {
+                    castAdapter.setCast(cast);
+                }
+                mListCast.addAll(cast);
             }
         }
     }
