@@ -12,4 +12,5 @@
     android:verticalSpacing="5dp"
     tools:context=".MainActivityFragment"
     android:drawSelectorOnTop="true"
+
     />

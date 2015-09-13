@@ -10,13 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.flaviofaria.kenburnsview.KenBurnsView;
-import com.jmadev.popularmovies.adapters.CastAdapter;
+import com.jmadev.popularmovies.adapters.TopCastAdapter;
 import com.jmadev.popularmovies.adapters.TrailerAdapter;
 import com.jmadev.popularmovies.models.Cast;
 import com.jmadev.popularmovies.models.Movie;
@@ -51,16 +52,19 @@ public class MovieDetailActivityFragment extends Fragment {
     ImageView movie_poster_image;
     KenBurnsView movie_backdrop;
     CollapsingToolbarLayout collapsingToolbarLayout;
+    Button mButton;
     Movie movie;
+    Cast cast;
     TextView vote_average;
     TextView movie_release_date;
     TextView overview_info;
     RatingBar ratingBar;
     public int movieId;
     private TrailerAdapter trailerAdapter;
-    private CastAdapter castAdapter;
+    private TopCastAdapter topCastAdapter;
     private ArrayList<Trailer> mListTrailers = new ArrayList<>();
-    private ArrayList<Cast> mListCast = new ArrayList<>();
+    private ArrayList<Cast> mListCast = new ArrayList<Cast>();
+    public static final String PAR_KEY = "com.jmadev.popularmovies.cast.par";
 
     public MovieDetailActivityFragment() {
     }
@@ -73,8 +77,20 @@ public class MovieDetailActivityFragment extends Fragment {
         if (getArguments() != null)
             movieId = getArguments().getInt("movieId");
 
+
+
         movie = getActivity().getIntent().getParcelableExtra(MainActivityFragment.PAR_KEY);
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+
+        mButton = (Button) rootView.findViewById(R.id.btn_all_cast);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), AllCastActivity.class);
+                intent.putParcelableArrayListExtra("castList", mListCast);
+                v.getContext().startActivity(intent);
+            }
+        });
 
         trailerAdapter = new TrailerAdapter(getActivity(), mListTrailers);
         LinearListView trailersView = (LinearListView) rootView.findViewById(R.id.trailer_youtube);
@@ -89,9 +105,9 @@ public class MovieDetailActivityFragment extends Fragment {
             }
         });
 
-        castAdapter = new CastAdapter(getActivity(), mListCast);
+        topCastAdapter = new TopCastAdapter(getActivity(), mListCast);
         LinearListView castView = (LinearListView) rootView.findViewById(R.id.cast_list);
-        castView.setAdapter(castAdapter);
+        castView.setAdapter(topCastAdapter);
 
         if (movie != null) {
             collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
@@ -269,6 +285,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 JSONObject castObject = castArray.getJSONObject(i);
                 Cast cast = new Cast();
                 cast.setName(castObject);
+                cast.setCharacter(castObject);
                 cast.setProfile_path(castObject);
                 castResults.add(cast);
             }
@@ -363,8 +380,8 @@ public class MovieDetailActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Cast> cast) {
             if(cast != null) {
-                if(castAdapter != null) {
-                    castAdapter.setCast(cast);
+                if(topCastAdapter != null) {
+                    topCastAdapter.setCast(cast);
                 }
                 mListCast.addAll(cast);
             }
