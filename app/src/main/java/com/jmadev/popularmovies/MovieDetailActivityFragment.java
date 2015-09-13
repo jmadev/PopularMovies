@@ -63,7 +63,8 @@ public class MovieDetailActivityFragment extends Fragment {
     private TrailerAdapter trailerAdapter;
     private TopCastAdapter topCastAdapter;
     private ArrayList<Trailer> mListTrailers = new ArrayList<>();
-    private ArrayList<Cast> mListCast = new ArrayList<Cast>();
+    private ArrayList<Cast> mListAllCast = new ArrayList<Cast>();
+    private ArrayList<Cast> mListTopCast = new ArrayList<>();
     public static final String PAR_KEY = "com.jmadev.popularmovies.cast.par";
 
     public MovieDetailActivityFragment() {
@@ -87,7 +88,7 @@ public class MovieDetailActivityFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), AllCastActivity.class);
-                intent.putParcelableArrayListExtra("castList", mListCast);
+                intent.putParcelableArrayListExtra("castList", mListAllCast);
                 v.getContext().startActivity(intent);
             }
         });
@@ -105,7 +106,7 @@ public class MovieDetailActivityFragment extends Fragment {
             }
         });
 
-        topCastAdapter = new TopCastAdapter(getActivity(), mListCast);
+        topCastAdapter = new TopCastAdapter(getActivity(), mListTopCast);
         LinearListView castView = (LinearListView) rootView.findViewById(R.id.cast_list);
         castView.setAdapter(topCastAdapter);
 
@@ -383,7 +384,7 @@ public class MovieDetailActivityFragment extends Fragment {
                 if(topCastAdapter != null) {
                     topCastAdapter.setCast(cast);
                 }
-                mListCast.addAll(cast);
+                mListAllCast.addAll(cast);
             }
         }
     }

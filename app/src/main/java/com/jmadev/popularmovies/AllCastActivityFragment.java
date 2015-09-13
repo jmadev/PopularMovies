@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class AllCastActivityFragment extends Fragment {
     private final String LOG_TAG = AllCastActivityFragment.class.getSimpleName();
-    Cast cast;
     private AllCastAdapter allCastAdapter;
     private List<Cast> mListCast;
     private RecyclerView rv;
@@ -35,16 +34,6 @@ public class AllCastActivityFragment extends Fragment {
 
         ArrayList<Cast> castList = getActivity().getIntent().getParcelableArrayListExtra("castList");
 
-//        String name = cast.getName();
-        Log.v(LOG_TAG, String.valueOf(castList.size()));
-//        TextView textView = (TextView) rootView.findViewById(R.id.test);
-
-        cast = castList.get(0);
-
-//        textView.setText(cast.getName());
-
-
-
         rv = (RecyclerView) rootView.findViewById(R.id.rv);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
@@ -53,8 +42,6 @@ public class AllCastActivityFragment extends Fragment {
 
         initializeData(castList);
         initializeAdapter(castList);
-
-
 
         return rootView;
     }
