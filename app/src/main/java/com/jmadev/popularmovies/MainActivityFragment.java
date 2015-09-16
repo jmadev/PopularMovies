@@ -39,8 +39,7 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
-//        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivityFragment extends Fragment  {
 
     public static final String RESULTS = "results";
     private static final String MOVIES_KEY = "state_movies";
@@ -51,8 +50,10 @@ public class MainActivityFragment extends Fragment {
     private static final String SORT_BY_SETTINGS_KEY = "";
     private String sortBy = POPULARITY_DESC;
     private ArrayList<Movie> mListMovies = new ArrayList<>();
+
     private MovieItemAdapter movieItemAdapter;
     public final static String PAR_KEY = "com.jmadev.popularmovies.par";
+
 
     public MainActivityFragment() {
     }
@@ -109,7 +110,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -176,6 +177,7 @@ public class MainActivityFragment extends Fragment {
         }
     }
 
+
     public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>> {
         private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
@@ -216,7 +218,7 @@ public class MainActivityFragment extends Fragment {
             String apiKey = getString(R.string.api_key);
 
             try {
-                //Construct the URL for the themovie.db.org query
+                //Construct the UR: for the themovie.db.org query
                 final String MOVIE_BASE_URL =
                         "http://api.themoviedb.org/3/discover/movie?";
                 final String SORT_PARAM = "sort_by";
@@ -293,12 +295,9 @@ public class MainActivityFragment extends Fragment {
             if (movies != null) {
                 if (movieItemAdapter != null)
                     movieItemAdapter.setMovies(movies);
+                mListMovies = new ArrayList<>();
                 mListMovies.addAll(movies);
             }
         }
     }
 }
-
-
-
-
