@@ -49,6 +49,7 @@ public class MovieItemAdapter extends ArrayAdapter<Movie>  {
                 .crossFade()
                 .into(mImageView);
 
+
         return convertView;
     }
 

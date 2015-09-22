@@ -21,9 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class FetchMovieCastTask extends AsyncTask<Void, Void, ArrayList<Cast>> {
+public class FetchCastTask extends AsyncTask<Void, Void, ArrayList<Cast>> {
 
-    private final String LOG_TAG = FetchMovieCastTask.class.getSimpleName();
+    private final String LOG_TAG = FetchCastTask.class.getSimpleName();
     public static final String CREDITS = "credits";
     public static final String CAST = "cast";
     private ArrayList<Cast> mListAllCast = new ArrayList<>();
@@ -31,7 +31,7 @@ public class FetchMovieCastTask extends AsyncTask<Void, Void, ArrayList<Cast>> {
     private Context mContext;
     private int movieId;
 
-    public FetchMovieCastTask(Context context, TopCastAdapter topCastAdapter, int movieId, ArrayList<Cast> mListAllCast) {
+    public FetchCastTask(Context context, TopCastAdapter topCastAdapter, int movieId, ArrayList<Cast> mListAllCast) {
         mContext = context;
         this.topCastAdapter = topCastAdapter;
         this.movieId = movieId;

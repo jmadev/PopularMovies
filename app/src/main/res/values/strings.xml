@@ -16,4 +16,7 @@
     <string name="cast">TOP CAST</string>
     <string name="title_activity_all_cast">AllCastActivity</string>
     <string name="show_all_cast">SHOW ALL CAST</string>
+    <string name="REVIEWS">REVIEWS</string>
+    <string name="reviews_str">SEE REVIEWS FOR THIS MOVIE</string>
+    <string name="title_activity_review">ReviewActivity</string>
 </resources>

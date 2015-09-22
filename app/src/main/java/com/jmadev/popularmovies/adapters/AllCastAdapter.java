@@ -19,7 +19,7 @@ import java.util.List;
 
 public class AllCastAdapter extends RecyclerView.Adapter<AllCastAdapter.CastViewHolder> {
 
-    private static final String LOG_TAG = TopCastAdapter.class.getSimpleName();
+    private static final String LOG_TAG = AllCastAdapter.class.getSimpleName();
 
     public static class CastViewHolder extends RecyclerView.ViewHolder {
         CardView cv;

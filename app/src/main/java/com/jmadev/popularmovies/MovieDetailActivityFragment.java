@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.flaviofaria.kenburnsview.KenBurnsView;
+import com.jmadev.popularmovies.adapters.ReviewAdapter;
 import com.jmadev.popularmovies.adapters.TopCastAdapter;
 import com.jmadev.popularmovies.adapters.TrailerAdapter;
-import com.jmadev.popularmovies.asynstasks.FetchMovieCastTask;
-import com.jmadev.popularmovies.asynstasks.FetchMovieTrailersTask;
+import com.jmadev.popularmovies.asynstasks.FetchCastTask;
+import com.jmadev.popularmovies.asynstasks.FetchTrailersTask;
 import com.jmadev.popularmovies.models.Cast;
 import com.jmadev.popularmovies.models.Movie;
+import com.jmadev.popularmovies.models.Review;
 import com.jmadev.popularmovies.models.Trailer;
 import com.linearlistview.LinearListView;
 
@@ -43,6 +46,7 @@ public class MovieDetailActivityFragment extends Fragment {
     Button mButton;
     Movie movie;
     Cast cast;
+    CardView cardview_review;
     TextView vote_average;
     TextView movie_release_date;
     TextView overview_info;
@@ -50,8 +54,9 @@ public class MovieDetailActivityFragment extends Fragment {
     public int movieId;
     private TrailerAdapter trailerAdapter;
     private TopCastAdapter topCastAdapter;
+    private ReviewAdapter reviewAdapter;
     private ArrayList<Trailer> mListTrailers = new ArrayList<>();
-
+    private ArrayList<Review> mListAllReviews = new ArrayList<>();
 
 
     private ArrayList<Cast> mListAllCast = new ArrayList<Cast>();
@@ -101,6 +106,18 @@ public class MovieDetailActivityFragment extends Fragment {
         LinearListView castView = (LinearListView) rootView.findViewById(R.id.cast_list);
         castView.setAdapter(topCastAdapter);
 
+        cardview_review = (CardView) rootView.findViewById(R.id.cardview_reviews);
+        cardview_review.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), ReviewActivity.class);
+                intent.putExtra("movieid", movie.getId());
+                v.getContext().startActivity(intent);
+            }
+        });
+
+
+
         if (movie != null) {
             collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
             movie_backdrop = (KenBurnsView) rootView.findViewById(R.id.movie_backdrop);
@@ -143,13 +160,14 @@ public class MovieDetailActivityFragment extends Fragment {
     }
 
     public void runFetchMovieTrailersTask() {
-        FetchMovieTrailersTask task = new FetchMovieTrailersTask(getActivity(), trailerAdapter, movie.getId());
+        FetchTrailersTask task = new FetchTrailersTask(getActivity(), trailerAdapter, movie.getId());
         task.execute();
     }
     public void runFetchMovieCastTask() {
-        FetchMovieCastTask castTask = new FetchMovieCastTask(getActivity(), topCastAdapter, movie.getId(), mListAllCast);
+        FetchCastTask castTask = new FetchCastTask(getActivity(), topCastAdapter, movie.getId(), mListAllCast);
         castTask.execute();
     }
+
 
 
 

@@ -34,7 +34,7 @@ public class AllCastActivityFragment extends Fragment {
 
         ArrayList<Cast> castList = getActivity().getIntent().getParcelableArrayListExtra("castList");
 
-        rv = (RecyclerView) rootView.findViewById(R.id.rv);
+        rv = (RecyclerView) rootView.findViewById(R.id.rv_cast);
 
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         rv.setLayoutManager(llm);

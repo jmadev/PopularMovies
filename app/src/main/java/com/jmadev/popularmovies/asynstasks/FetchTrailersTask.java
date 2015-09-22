@@ -21,9 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class FetchMovieTrailersTask extends AsyncTask<Void, Void, ArrayList<Trailer>> {
+public class FetchTrailersTask extends AsyncTask<Void, Void, ArrayList<Trailer>> {
 
-    private final String LOG_TAG = FetchMovieTrailersTask.class.getSimpleName();
+    private final String LOG_TAG = FetchTrailersTask.class.getSimpleName();
     public static final String YOUTUBE = "youtube";
     public static final String TRAILERS = "trailers";
     private ArrayList<Trailer> mListTrailers = new ArrayList<>();
@@ -32,7 +32,7 @@ public class FetchMovieTrailersTask extends AsyncTask<Void, Void, ArrayList<Trai
     private int movieId;
     private TrailerAdapter trailerAdapter;
 
-    public FetchMovieTrailersTask(Context context, TrailerAdapter trailerAdapter, int movieId) {
+    public FetchTrailersTask(Context context, TrailerAdapter trailerAdapter, int movieId) {
         mContext = context;
         this.trailerAdapter = trailerAdapter;
         this.movieId = movieId;
