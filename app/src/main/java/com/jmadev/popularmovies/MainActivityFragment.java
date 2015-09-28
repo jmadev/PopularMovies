@@ -17,7 +17,9 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.jmadev.popularmovies.adapters.MovieItemAdapter;
+import com.jmadev.popularmovies.asynstasks.FetchFavoritesTask;
 import com.jmadev.popularmovies.asynstasks.FetchMovieTask;
+import com.jmadev.popularmovies.data.MovieContract;
 import com.jmadev.popularmovies.models.Movie;
 
 import java.util.ArrayList;
@@ -35,13 +37,22 @@ public class MainActivityFragment extends Fragment  {
     private List<Movie> movies = new ArrayList<>();
     private static final String POPULARITY_DESC = "popularity.desc";
     private static final String RATING_DESC = "vote_average.desc";
+    private static final String FAVORITES = "favorites";
     private static final String SORT_BY_SETTINGS_KEY = "";
     private static String sortBy = POPULARITY_DESC;
     private ArrayList<Movie> mListMovies = new ArrayList<>();
-
     private MovieItemAdapter movieItemAdapter;
     public final static String PAR_KEY = "com.jmadev.popularmovies.par";
 
+    public static final String[] MOVIE_COLUMNS = {
+            MovieContract.MovieEntry.COL_ID,
+            MovieContract.MovieEntry.COL_TITLE,
+            MovieContract.MovieEntry.COL_POSTER_PATH,
+            MovieContract.MovieEntry.COL_OVERVIEW,
+            MovieContract.MovieEntry.COL_RELEASE_DATE,
+            MovieContract.MovieEntry.COL_BACKDROP_PATH,
+            MovieContract.MovieEntry.COL_VOTE_AVERAGE
+    };
 
     public MainActivityFragment() {
     }
@@ -59,6 +70,7 @@ public class MainActivityFragment extends Fragment  {
 
         MenuItem action_sort_by_popularity = menu.findItem(R.id.action_sort_by_popularity);
         MenuItem action_sort_by_rating = menu.findItem(R.id.action_sort_by_rating);
+        MenuItem action_sort_by_favorites = menu.findItem(R.id.action_sort_by_favorites);
 
         switch (sortBy) {
             case POPULARITY_DESC:
@@ -68,6 +80,10 @@ public class MainActivityFragment extends Fragment  {
             case RATING_DESC:
                 if (!action_sort_by_rating.isChecked())
                     action_sort_by_rating.setChecked(true);
+                break;
+            case FAVORITES:
+                if(!action_sort_by_favorites.isChecked())
+                    action_sort_by_favorites.setChecked(true);
         }
     }
 
@@ -90,6 +106,14 @@ public class MainActivityFragment extends Fragment  {
                 else
                     item.setChecked(true);
                 sortBy = RATING_DESC;
+                updateMovie(sortBy);
+                return true;
+            case R.id.action_sort_by_favorites:
+                if(item.isChecked())
+                    item.setChecked(false);
+                else
+                    item.setChecked(true);
+                sortBy = FAVORITES;
                 updateMovie(sortBy);
                 return true;
             default:
@@ -159,9 +183,13 @@ public class MainActivityFragment extends Fragment  {
 
 
     private void updateMovie(String sortBy) {
-        if (hasInternetConnection()) {
+        if (hasInternetConnection() && !sortBy.contentEquals(FAVORITES)) {
             FetchMovieTask movieTask = new FetchMovieTask(getActivity(), movieItemAdapter);
             movieTask.execute(sortBy);
+        }
+        else if (sortBy.contentEquals(FAVORITES)) {
+            FetchFavoritesTask fetchFavoritesTask = new FetchFavoritesTask(getActivity(), movieItemAdapter);
+            fetchFavoritesTask.execute();
         }
     }
 

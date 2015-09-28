@@ -36,6 +36,9 @@
             android:name=".ReviewActivity"
             android:label="@string/title_activity_review" >
         </activity>
+        <provider
+            android:authorities="com.jmadev.popularmovies"
+            android:name=".data.MovieProvider" />
     </application>
 
 </manifest>

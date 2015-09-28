@@ -19,4 +19,5 @@
     <string name="REVIEWS">REVIEWS</string>
     <string name="reviews_str">SEE REVIEWS FOR THIS MOVIE</string>
     <string name="title_activity_review">ReviewActivity</string>
+    <string name="favorites">Favorites</string>
 </resources>

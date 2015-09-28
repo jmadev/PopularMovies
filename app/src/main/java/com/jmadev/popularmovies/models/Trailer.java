@@ -8,11 +8,8 @@ public class Trailer {
 
     private String name;
     private String source;
-
     public static final String NAME = "name";
     public static final String SOURCE = "source";
-
-
 
     public void setName(JSONObject trailerJsonObject) throws JSONException {
         this.name = trailerJsonObject.getString(NAME);
@@ -21,8 +18,6 @@ public class Trailer {
     public void setSource(JSONObject trailerJsonObject) throws JSONException {
         this.source = trailerJsonObject.getString(SOURCE);
     }
-
-
 
     public String getName() {
         return name;

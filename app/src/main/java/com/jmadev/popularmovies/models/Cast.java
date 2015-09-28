@@ -36,10 +36,6 @@ public class Cast implements Parcelable {
         this.profile_path = in.readString();
     }
 
-
-
-
-
     public void setName(JSONObject castJsonObject) throws JSONException {
         this.name = castJsonObject.getString(NAME);
     }

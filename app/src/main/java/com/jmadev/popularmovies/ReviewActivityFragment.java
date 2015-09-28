@@ -36,7 +36,6 @@ public class ReviewActivityFragment extends Fragment {
 
         ArrayList<Review> reviewList = new ArrayList<>();
 
-
         movieId = getActivity().getIntent().getIntExtra("movieid", 0);
         rv = (RecyclerView) rootView.findViewById(R.id.rv_review);
 

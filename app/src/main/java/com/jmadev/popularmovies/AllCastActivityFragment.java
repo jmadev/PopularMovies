@@ -46,8 +46,6 @@ public class AllCastActivityFragment extends Fragment {
         return rootView;
     }
 
-
-
     private void initializeData(List<Cast> castList) {
         mListCast = new ArrayList<>();
         for (int i = 0; i < castList.size(); i++) {

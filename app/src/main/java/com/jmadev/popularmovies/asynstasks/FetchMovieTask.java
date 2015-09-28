@@ -147,7 +147,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<Movie>> {
 
     @Override
     protected void onPostExecute(ArrayList<Movie> movies) {
-
         if (movies != null) {
             if (movieItemAdapter != null)
                 movieItemAdapter.setMovies(movies);

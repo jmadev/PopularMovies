@@ -23,8 +23,6 @@ public class MovieItemAdapter extends ArrayAdapter<Movie>  {
         super (context, 0, movies);
     }
 
-
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Movie movie = getItem(position);
@@ -41,15 +39,13 @@ public class MovieItemAdapter extends ArrayAdapter<Movie>  {
         textView = (TextView) convertView.findViewById(R.id.movie_title);
         textView.setText(movie.getTitle());
         String url = movie.getPosterPath();
-        Log.v(LOG_TAG, "Movie poster url : " + url);
-        Log.v(LOG_TAG, "MOVIEITEMADAPATER CAPLLED!");
+        Log.v(LOG_TAG, "Movie Title: " + movie.getTitle());
+        Log.v(LOG_TAG, "Poster Path: " + movie.getPosterPath());
         Glide.with(getContext())
                 .load(url)
                 .fitCenter()
                 .crossFade()
                 .into(mImageView);
-
-
         return convertView;
     }
 

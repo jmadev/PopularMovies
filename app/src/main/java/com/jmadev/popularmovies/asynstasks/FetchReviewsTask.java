@@ -156,7 +156,6 @@ public class FetchReviewsTask extends AsyncTask<Void, Void, ArrayList<Review>> {
         } else {
             reviewAdapter = new ReviewAdapter(mContext, reviews);
             rv.setAdapter(reviewAdapter);
-
         }
     }
 }

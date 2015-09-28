@@ -22,8 +22,6 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
         super (context, 0, trailers);
     }
 
-
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Trailer trailer = getItem(position);
@@ -47,7 +45,6 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
                 .fitCenter()
                 .crossFade()
                 .into(mImageView);
-
         return convertView;
     }
 

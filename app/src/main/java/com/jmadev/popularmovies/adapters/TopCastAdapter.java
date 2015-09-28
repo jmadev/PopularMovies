@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,7 +29,6 @@ public class TopCastAdapter extends ArrayAdapter<Cast> {
 
         Cast cast = getItem(position);
 
-        final Button mButton;
         final ImageView mImageView;
         final TextView mTextView;
         if (convertView == null) {
@@ -38,7 +36,6 @@ public class TopCastAdapter extends ArrayAdapter<Cast> {
                     R.layout.top_cast_item, parent, false);
 
         }
-
 
         mImageView = (ImageView) convertView.findViewById(R.id.cast_image);
         mTextView = (TextView) convertView.findViewById(R.id.cast_name);
@@ -50,16 +47,11 @@ public class TopCastAdapter extends ArrayAdapter<Cast> {
                 .fitCenter()
                 .crossFade()
                 .into(mImageView);
-
-
         return convertView;
     }
 
     public void setCast(List<Cast> listCast) {
         clear();
-//        for(Cast cast : listCast){
-//            add(cast);
-//        }
         for (int i = 0; i < 5; i++) {
             add(listCast.get(i));
         }

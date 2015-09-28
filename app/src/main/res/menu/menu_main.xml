@@ -14,6 +14,8 @@
                     android:checked="true"/>
                 <item android:id="@+id/action_sort_by_rating"
                     android:title="@string/highest_rated" />
+                <item android:id="@+id/action_sort_by_favorites"
+                    android:title="@string/favorites"/>
             </group>
         </menu>
 
