@@ -2,25 +2,31 @@ package com.jmadev.popularmovies;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MovieDetailActivity extends AppCompatActivity {
-    Toolbar toolbar;
-
+    private final String LOG_TAG = MovieDetailActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-        initToolbar();
-    }
 
-    private void initToolbar() {
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        if (savedInstanceState == null) {
+
+            Bundle args = new Bundle();
+            args.putParcelable(MovieDetailActivityFragment.MOVIEDETAILACTIVITY,
+                    getIntent().getParcelableExtra(MovieDetailActivityFragment.MOVIEDETAILACTIVITY));
+
+            MovieDetailActivityFragment mdaf = new MovieDetailActivityFragment();
+            mdaf.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_detail_container, mdaf)
+                    .commit();
+        }
+
     }
 
     @Override

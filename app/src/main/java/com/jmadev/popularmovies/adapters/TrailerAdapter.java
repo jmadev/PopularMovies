@@ -35,16 +35,18 @@ public class TrailerAdapter extends ArrayAdapter<Trailer> {
                     R.layout.trailer_item, parent, false);
         }
 
-        mImageView = (ImageView) convertView.findViewById(R.id.trailer_image);
-        textView = (TextView) convertView.findViewById(R.id.trailer_name);
-        textView.setText(trailer.getName());
-        String url = "http://img.youtube.com/vi/" + trailer.getSource() + "/0.jpg";
-        Log.v(LOG_TAG, "Movie Trailer url : " + url);
-        Glide.with(getContext())
-                .load(url)
-                .fitCenter()
-                .crossFade()
-                .into(mImageView);
+        if (trailer != null) {
+            mImageView = (ImageView) convertView.findViewById(R.id.trailer_image);
+            textView = (TextView) convertView.findViewById(R.id.trailer_name);
+            textView.setText(trailer.getName());
+            String url = "http://img.youtube.com/vi/" + trailer.getSource() + "/0.jpg";
+            Log.v(LOG_TAG, "Movie Trailer url : " + url);
+            Glide.with(getContext())
+                    .load(url)
+                    .fitCenter()
+                    .crossFade()
+                    .into(mImageView);
+        }
         return convertView;
     }
 

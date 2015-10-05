@@ -1,7 +1,6 @@
 package com.jmadev.popularmovies;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -29,7 +28,7 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment  {
+public class MainActivityFragment extends Fragment {
 
 
     private static final String MOVIES_KEY = "state_movies";
@@ -42,7 +41,6 @@ public class MainActivityFragment extends Fragment  {
     private static String sortBy = POPULARITY_DESC;
     private ArrayList<Movie> mListMovies = new ArrayList<>();
     private MovieItemAdapter movieItemAdapter;
-    public final static String PAR_KEY = "com.jmadev.popularmovies.par";
 
     public static final String[] MOVIE_COLUMNS = {
             MovieContract.MovieEntry.COL_ID,
@@ -56,6 +54,19 @@ public class MainActivityFragment extends Fragment  {
 
     public MainActivityFragment() {
     }
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        void onItemSelected(Movie movie);
+    }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +93,7 @@ public class MainActivityFragment extends Fragment  {
                     action_sort_by_rating.setChecked(true);
                 break;
             case FAVORITES:
-                if(!action_sort_by_favorites.isChecked())
+                if (!action_sort_by_favorites.isChecked())
                     action_sort_by_favorites.setChecked(true);
         }
     }
@@ -109,7 +120,7 @@ public class MainActivityFragment extends Fragment  {
                 updateMovie(sortBy);
                 return true;
             case R.id.action_sort_by_favorites:
-                if(item.isChecked())
+                if (item.isChecked())
                     item.setChecked(false);
                 else
                     item.setChecked(true);
@@ -128,17 +139,13 @@ public class MainActivityFragment extends Fragment  {
 
         movieItemAdapter = new MovieItemAdapter(getActivity(), movies);
 
-        GridView gridView = (GridView) rootView.findViewById(R.id.movie_grid);
+        final GridView gridView = (GridView) rootView.findViewById(R.id.movie_grid);
         gridView.setAdapter(movieItemAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Movie movie = (Movie) parent.getAdapter().getItem(position);
-                Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(PAR_KEY, movie);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                Movie movie = movieItemAdapter.getItem(position);
+                ((Callback) getActivity()).onItemSelected(movie);
             }
         });
 
@@ -186,8 +193,7 @@ public class MainActivityFragment extends Fragment  {
         if (hasInternetConnection() && !sortBy.contentEquals(FAVORITES)) {
             FetchMovieTask movieTask = new FetchMovieTask(getActivity(), movieItemAdapter);
             movieTask.execute(sortBy);
-        }
-        else if (sortBy.contentEquals(FAVORITES)) {
+        } else if (sortBy.contentEquals(FAVORITES)) {
             FetchFavoritesTask fetchFavoritesTask = new FetchFavoritesTask(getActivity(), movieItemAdapter);
             fetchFavoritesTask.execute();
         }

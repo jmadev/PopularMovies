@@ -7,9 +7,12 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +49,6 @@ public class MovieDetailActivityFragment extends Fragment {
 
     private final String LOG_TAG = MovieDetailActivityFragment.class.getSimpleName();
 
-
     ImageView movie_poster_image;
     KenBurnsView movie_backdrop;
     CollapsingToolbarLayout collapsingToolbarLayout;
@@ -58,29 +60,39 @@ public class MovieDetailActivityFragment extends Fragment {
     TextView overview_info;
     RatingBar ratingBar;
     FloatingActionButton fab;
-    public int movieId;
     private TrailerAdapter trailerAdapter;
     private TopCastAdapter topCastAdapter;
     private ArrayList<Trailer> mListTrailers = new ArrayList<>();
-
+    private CoordinatorLayout coordinatorLayout;
+    private Toolbar toolbar;
     private Toast toast;
     private ArrayList<Cast> mListAllCast = new ArrayList<>();
     private ArrayList<Cast> mListTopCast = new ArrayList<>();
+    static final String MOVIEDETAILACTIVITY = "moviedetailactivity";
 
     public MovieDetailActivityFragment() {
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if (getArguments() != null)
-            movieId = getArguments().getInt("movieId");
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            movie = arguments.getParcelable(MovieDetailActivityFragment.MOVIEDETAILACTIVITY);
+        }
 
+        boolean isFavorited = false;
 
-        movie = getActivity().getIntent().getParcelableExtra(MainActivityFragment.PAR_KEY);
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+
+        coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinator_layout);
+
+        if (movie != null) {
+            coordinatorLayout.setVisibility(View.VISIBLE);
+            isFavorited = Util.isFavorited(getActivity(), movie.getId());
+        } else
+            coordinatorLayout.setVisibility(View.INVISIBLE);
 
         mButton = (Button) rootView.findViewById(R.id.btn_all_cast);
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +105,7 @@ public class MovieDetailActivityFragment extends Fragment {
         });
 
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        boolean isFavorited = Util.isFavorited(getActivity(), movie.getId());
+
         if (isFavorited) {
             fab.setImageResource(R.drawable.ic_action_unfav);
         } else
@@ -101,8 +113,6 @@ public class MovieDetailActivityFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                FavoritesTask fetchFavoritesTask = new FavoritesTask(getActivity(), movie.getId(), movie);
-//                fetchFavoritesTask.execute();
                 boolean isFavorited = Util.isFavorited(getActivity(), movie.getId());
                 if (isFavorited) {
                     DeleteFromFavTask deleteFromFavTask = new DeleteFromFavTask(getActivity(), movie);
@@ -162,6 +172,16 @@ public class MovieDetailActivityFragment extends Fragment {
 
 
         if (movie != null) {
+
+            toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+
+            AppCompatActivity activity = (AppCompatActivity) getActivity();
+            if (toolbar != null) {
+                toolbar.bringToFront();
+                activity.setSupportActionBar(toolbar);
+                activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                activity.getSupportActionBar().setHomeButtonEnabled(true);
+            }
             collapsingToolbarLayout = (CollapsingToolbarLayout) rootView.findViewById(R.id.collapsing_toolbar);
             movie_backdrop = (KenBurnsView) rootView.findViewById(R.id.movie_backdrop);
             movie_poster_image = (ImageView) rootView.findViewById(R.id.movie_poster_image);
@@ -199,6 +219,7 @@ public class MovieDetailActivityFragment extends Fragment {
         return rootView;
     }
 
+
     public void runFetchMovieTrailersTask() {
         FetchTrailersTask task = new FetchTrailersTask(getActivity(), trailerAdapter, movie.getId());
         task.execute();
@@ -220,7 +241,7 @@ public class MovieDetailActivityFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (hasInternetConnection()) {
+        if (hasInternetConnection() && movie != null) {
             runFetchMovieTrailersTask();
             runFetchMovieCastTask();
         } else {

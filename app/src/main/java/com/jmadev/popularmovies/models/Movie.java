@@ -105,13 +105,13 @@ public class Movie implements Parcelable {
     };
 
     public Movie(Parcel in) {
-        this.id = in.readInt();
-        this.backdropPath = in.readString();
-        this.overview = in.readString();
-        this.releaseDate = in.readString();
-        this.posterPath = in.readString();
-        this.title = in.readString();
-        this.voteAverage = in.readDouble();
+        id = in.readInt();
+        backdropPath = in.readString();
+        overview = in.readString();
+        releaseDate = in.readString();
+        posterPath = in.readString();
+        title = in.readString();
+        voteAverage = in.readDouble();
     }
 
     public String getBackdropPath() {

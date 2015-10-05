@@ -37,16 +37,18 @@ public class TopCastAdapter extends ArrayAdapter<Cast> {
 
         }
 
-        mImageView = (ImageView) convertView.findViewById(R.id.cast_image);
-        mTextView = (TextView) convertView.findViewById(R.id.cast_name);
-        mTextView.setText(cast.getName());
-        String url = cast.getProfile_path();
-        Log.v(LOG_TAG, url);
-        Glide.with(getContext())
-                .load(url)
-                .fitCenter()
-                .crossFade()
-                .into(mImageView);
+        if (cast != null) {
+            mImageView = (ImageView) convertView.findViewById(R.id.cast_image);
+            mTextView = (TextView) convertView.findViewById(R.id.cast_name);
+            mTextView.setText(cast.getName());
+            String url = cast.getProfile_path();
+            Log.v(LOG_TAG, url);
+            Glide.with(getContext())
+                    .load(url)
+                    .fitCenter()
+                    .crossFade()
+                    .into(mImageView);
+        }
         return convertView;
     }
 
