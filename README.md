@@ -3,6 +3,11 @@
 
 Built an app, optimized for tablets, to help users discover popular and highly rated movies on the web. It displays a scrolling grid of movie trailers, launches a details screen whenever a particular movie is selected, allows users to save favorites, play trailers, and read user reviews. This app utilizes core Android user interface components and fetches movie information using themoviedb.org web API.
 
+## Screenshots
+<img src="https://github.com/jmadev/PopularMovies/blob/master/screenshots/phonemovies.png?raw=true" height="500">
+<img src="https://github.com/jmadev/PopularMovies/blob/master/screenshots/movie%20details.png?raw=true" height="500">
+
+
 ## API Key
 This app will need an API from [The Movie Database](https://www.themoviedb.org/documentation/api) to retrieve movies. When you get your own, you will need to put it in the strings.xml file.
 
